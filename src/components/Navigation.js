@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import { useDispatch, useSelector } from "react-redux";
-import { submissionUpdate } from "../features/slices/navigationSlice";
+import {
+  dropdownUpdate,
+  searchUpdate,
+  submissionUpdate,
+} from "../features/slices/navigationSlice";
 
 const Navigation = () => {
   const currentSubmissionsTab = useSelector(
@@ -11,12 +15,40 @@ const Navigation = () => {
   const [inputValue, setInputValue] = useState("");
   const [dropdownValue, setDropdownValue] = useState("Newest");
 
+  const handleInputChange = (event) => {
+    event.preventDefault();
+    setInputValue(event.target.value);
+
+  };
+
+  const handleDropdownChange =  (e) =>{
+    setDropdownValue(e.target.value)
+    dispatch(dropdownUpdate(e.target.value));
+  }
+  const handleKeyDown = (e) => {
+    if (e.keyCode === 13) {
+      dispatch(searchUpdate(inputValue));
+    }
+  };
+
+  const handleAllSubmission = () =>{
+    dispatch(submissionUpdate("All Submissions"))
+    dispatch(searchUpdate(null))
+    setInputValue("")
+  }
+
+  const handleFavSubmission = () =>{
+    dispatch(submissionUpdate("Favourite Submissions"))
+    dispatch(searchUpdate(null))
+    setInputValue("")
+  }
+
   const dropdownOption = ["Newest", "Oldest"];
 
   return (
     <div className="flex justify-between items-center px-16 py-8">
       <div className="flex items-center">
-        <div onClick={() => dispatch(submissionUpdate("All Submissions"))}>
+        <div onClick={handleAllSubmission}>
           <span
             className={
               currentSubmissionsTab === "All Submissions"
@@ -28,7 +60,7 @@ const Navigation = () => {
           </span>
         </div>
         <div
-          onClick={() => dispatch(submissionUpdate("Favourite Submissions"))}
+          onClick={handleFavSubmission}
         >
           <span
             className={
@@ -49,14 +81,15 @@ const Navigation = () => {
             placeholder="Search"
             value={inputValue}
             className="outline-0 ml-2"
-            onChange={(event) => setInputValue(event.target.value)}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
           />
         </div>
         <div className="ml-4">
           <select
             className="border rounded-2xl border-gray-600 px-8 py-1 outline-0"
             value={dropdownValue}
-            onChange={(e) => setDropdownValue(e.target.value)}
+            onChange={handleDropdownChange}
           >
             {dropdownOption.map((item, index) => (
               <option key={index} value={item}>
